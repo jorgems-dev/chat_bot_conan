@@ -18,7 +18,7 @@ st.markdown("<h1 style='text-align: center; font-size: 32px;'>ChatBot Conan 👾
 st.markdown("<p style='text-align: center; font-size: 24px'> *ChatBot en desarrollo*</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 24px'> ¿Con qué te puedo ayudar hoy?</p>", unsafe_allow_html=True)
 
-chat_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.5, api_key=os.getenv("API_KEY_GEMINI"))
+chat_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.5)
 
 
 with st.sidebar:
@@ -26,7 +26,7 @@ with st.sidebar:
    temperature = st.slider("Temperatura", 0.0, 1.0, 0.5, 0.1)
    model_name = st.selectbox("Modelo", ["gemini-2.5-flash"])
 
-   chat_model = ChatGoogleGenerativeAI(model=model_name, temperature=temperature, api_key=os.getenv("API_KEY_GEMINI"))
+   chat_model = ChatGoogleGenerativeAI(model=model_name, temperature=temperature)
 
 
 # Inicializa el historial de mensajes del chat
