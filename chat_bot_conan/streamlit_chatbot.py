@@ -1,10 +1,13 @@
 import os
+from dotenv import load_dotenv
 from datetime import datetime
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
+from langchain.prompts import ChatPromptTemplate
+
 import streamlit as st
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -18,7 +21,7 @@ st.markdown("<h1 style='text-align: center; font-size: 32px;'>ChatBot Conan 👾
 st.markdown("<p style='text-align: center; font-size: 24px'> *ChatBot en desarrollo*</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 24px'> ¿Con qué te puedo ayudar hoy?</p>", unsafe_allow_html=True)
 
-chat_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.5)
+chat_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.5, google_api_key=os.getenv("GEMINI_API_KEY"))
 
 
 with st.sidebar:
@@ -26,23 +29,37 @@ with st.sidebar:
    temperature = st.slider("Temperatura", 0.0, 1.0, 0.5, 0.1)
    model_name = st.selectbox("Modelo", ["gemini-2.5-flash"])
 
-   chat_model = ChatGoogleGenerativeAI(model=model_name, temperature=temperature)
+   personalidad = st.selectbox(
+      "Personalidad del Asistente",
+      [
+         "Útil y amigable",
+         "Profesional y formal",
+         "Casual y relajado",
+         "Experto técnico",
+         "Creativo y divertido"
+      ]
+   )
+
+   chat_model = ChatGoogleGenerativeAI(model=model_name, temperature=temperature, google_api_key=os.getenv("GEMINI_API_KEY"))
+
+   system_messages = {
+        "Útil y amigable": "Eres un asistente útil y amigable llamado ChatBot Pro. Responde de manera clara y concisa.",
+        "Profesional y formal": "Eres un asistente profesional y formal. Proporciona respuestas precisas y bien estructuradas.",
+        "Casual y relajado": "Eres un asistente casual y relajado. Habla de forma natural y amigable, como un buen amigo.",
+        "Experto técnico": "Eres un asistente experto técnico. Proporciona respuestas detalladas con precisión técnica.",
+        "Creativo y divertido": "Eres un asistente creativo y divertido. Usa analogías, ejemplos creativos y mantén un tono alegre."   
+   }
+   chat_prompt = ChatPromptTemplate.from_messages([
+      ("system", system_messages[personalidad]),
+      ("human", "Historial de conversación:\n{historial}\n\nPregunta actual: {mensaje}")
+   ])
+
+   cadena = chat_prompt | chat_model
 
 
 # Inicializa el historial de mensajes del chat
 if "mensajes" not in st.session_state:
    st.session_state.mensajes = []
-
-prompt_template = PromptTemplate(
-   input_variables=["mensaje", "historial"],
-   template="""Eres un asistente útil y amigable llamado ChatBot Conan.
-   Historial de conversación:
-   {historial}
-   
-   Responde de forma clara y concisa a la siguiente pregunta: {mensaje}"""
-)
-
-cadena = prompt_template | chat_model
 
 # Mostrar mensajes precios en la interfaz
 for item in st.session_state.mensajes:
