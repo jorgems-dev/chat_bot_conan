@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-class cv(BaseModel):
+class Modelo_cv(BaseModel):
     nombre_candidato: str = Field(description="Nombre completo del candidato extraído del CV.")
     experiencia_años: int = Field(description="Años totales de experiencia laboral relevante.")
     habilidades_clave: list[str] = Field(description="Lista de las habilidades más relevantes del candidato para el puesto.")
